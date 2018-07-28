@@ -347,7 +347,7 @@ export function addRootDepsElectron(tree: Tree, packageJson?: any) {
     const deps: NodeDependency[] = [];
     let dep: NodeDependency = {
       name: 'electron',
-      version: '',
+      version: '2.0.5',
       type: 'devDependency'
     };
     deps.push(dep);
