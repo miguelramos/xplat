@@ -20,7 +20,7 @@ import { errorXplat } from './errors';
 import * as fs from 'fs';
 import * as ts from 'typescript';
 
-export const supportedPlatforms = ['web', 'nativescript', 'ionic'];
+export const supportedPlatforms = ['web', 'nativescript', 'ionic', 'electron'];
 export interface ITargetPlatforms {
   web?: boolean;
   nativescript?: boolean;
@@ -29,7 +29,7 @@ export interface ITargetPlatforms {
 }
 export const defaultPlatforms = 'web,nativescript';
 
-export type IDevMode = 'web' | 'nativescript' | 'ionic' | 'fullstack';
+export type IDevMode = 'web' | 'nativescript' | 'ionic' | 'fullstack' | 'electron';
 
 export interface NodeDependency {
   name: string;
@@ -318,6 +318,37 @@ export function addRootDepsIonic(tree: Tree, packageJson?: any) {
       name: `@${getNpmScope()}/scss`,
       version: 'file:libs/scss',
       type: 'dependency'
+    };
+    deps.push(dep);
+
+    const dependenciesMap = Object.assign({}, packageJson.dependencies);
+    const devDependenciesMap = Object.assign({}, packageJson.devDependencies);
+    for (const dependency of deps) {
+      if (dependency.type === 'dependency') {
+        packageJson.dependencies = setDependency(dependenciesMap, dependency);
+      } else {
+        packageJson.devDependencies = setDependency(
+          devDependenciesMap,
+          dependency
+        );
+      }
+    }
+    return updateJsonFile(tree, packagePath, packageJson);
+  }
+  return tree;
+}
+
+export function addRootDepsElectron(tree: Tree, packageJson?: any) {
+  const packagePath = 'package.json';
+  if (!packageJson) {
+    packageJson = getJsonFromFile(tree, packagePath);
+  }
+  if (packageJson) {
+    const deps: NodeDependency[] = [];
+    let dep: NodeDependency = {
+      name: 'electron',
+      version: '',
+      type: 'devDependency'
     };
     deps.push(dep);
 
